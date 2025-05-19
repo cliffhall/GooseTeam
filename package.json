@@ -5,6 +5,7 @@
     "build": "node esbuild.config.cjs && echo '{\"type\": \"commonjs\"}' > dist/package.json",
     "stdio:proxy": "npx mcp-proxy --port 3001 --endpoint /sse node dist/stdio.js",
     "sse:direct": "cd dist && node sse.js",
+    "streamableHttp:direct": "cd dist && node streamableHttp.js",
     "inspector": "npx @modelcontextprotocol/inspector",
     "agent:text": "goose run -i instructions/protocol-as-text.md",
     "agent:chart": "goose run -i instructions/protocol-as-chart.md",
@@ -38,8 +39,8 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "@modelcontextprotocol/inspector": "^0.6.0",
-    "@modelcontextprotocol/sdk": "^1.5.0",
+    "@modelcontextprotocol/inspector": "^0.12.0",
+    "@modelcontextprotocol/sdk": "^1.11.4",
     "@types/express": "^5.0.0",
     "mcp-proxy": "^2.4.0",
     "node-fetch": "^2.7.0"
