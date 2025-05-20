@@ -36,7 +36,6 @@ import {
 } from "./operations/tasks.ts";
 
 export const createServer = () => {
-
   // Instantiate the MCP server
   const server = new Server(
     {
@@ -154,7 +153,10 @@ export const createServer = () => {
           const messageId = addMessage(args.senderId, args.content);
           return {
             content: [
-              { type: "text", text: `Message ${messageId} added successfully.` },
+              {
+                type: "text",
+                text: `Message ${messageId} added successfully.`,
+              },
             ],
           };
         }
@@ -200,7 +202,9 @@ export const createServer = () => {
         case "list_tasks": {
           const allTasks = listTasks();
           return {
-            content: [{ type: "text", text: JSON.stringify(allTasks, null, 2) }],
+            content: [
+              { type: "text", text: JSON.stringify(allTasks, null, 2) },
+            ],
           };
         }
         case "complete_task": {
@@ -226,4 +230,4 @@ export const createServer = () => {
   });
 
   return { server };
-}
+};

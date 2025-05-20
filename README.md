@@ -186,7 +186,14 @@ I suggest doing `build`,` mcp-proxy`, and `agent:test` and if the model you have
 ### SSE Server - Direct
 
 - `npm run sse:direct`
-- Launches an SSE-wrapped instance of the STDIO-wrapped GooseTeam MCP server on port `:3001` with endpoint `/sse`
+- Launches an SSE-wrapped instance of the GooseTeam MCP server on port `:3001` with endpoint `/sse`
+- Multiple clients can connect to the same server and see the same resources
+- Equivalent to the proxied STDIO approach, using our SSE version of the server.
+
+### StreamableHTTP Server - Direct
+
+- `npm run streamableHttp:direct`
+- Launches a StreamableHTTP-wrapped instance of the GooseTeam MCP server on port `:3001` with endpoint `/mcp`
 - Multiple clients can connect to the same server and see the same resources
 - Equivalent to the proxied STDIO approach, using our SSE version of the server.
 
@@ -196,9 +203,9 @@ I suggest doing `build`,` mcp-proxy`, and `agent:test` and if the model you have
 - Runs the [Model Context Protocol Inspector](https://modelcontextprotocol.io/docs/tools/inspector)
 - The Inspector UI will be available at: http://localhost:5173
 - In the Inspector UI:
-  - Make sure `Transport Type` is set to `SSE`
-  - Make sure `URL` is set to http://localhost:3001/sse
-  - Click its **"Connect"** button to connect to the MCP Proxy
+  - Make sure `Transport Type` is set to `StreamableHttp`
+  - Make sure `URL` is set to http://localhost:3001/mcp
+  - Click its **"Connect"** button
     - You should see Green light 🟢and **"Connected"** message.
   - Click its **List Tools** button
 - Multiple instances of the client can connect to the same server and share the same resources

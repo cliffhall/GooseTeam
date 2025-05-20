@@ -1,10 +1,10 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { InMemoryEventStore } from '@modelcontextprotocol/sdk/examples/shared/inMemoryEventStore.js';
+import { InMemoryEventStore } from "@modelcontextprotocol/sdk/examples/shared/inMemoryEventStore.js";
 import express, { Request, Response } from "express";
-import { createServer } from"./goose-team.ts";
-import { randomUUID } from 'node:crypto';
+import { createServer } from "./goose-team.ts";
+import { randomUUID } from "node:crypto";
 
-console.error('Starting Streamable HTTP server...');
+console.error("Starting Streamable HTTP server...");
 
 const app = express();
 
@@ -12,11 +12,11 @@ const { server } = createServer();
 
 const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
 
-app.post('/mcp', async (req: Request, res: Response) => {
-  console.error('Received MCP POST request');
+app.post("/mcp", async (req: Request, res: Response) => {
+  console.error("Received MCP POST request");
   try {
     // Check for existing session ID
-    const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    const sessionId = req.headers["mcp-session-id"] as string | undefined;
     let transport: StreamableHTTPServerTransport;
 
     if (sessionId && transports[sessionId]) {
@@ -33,14 +33,16 @@ app.post('/mcp', async (req: Request, res: Response) => {
           // This avoids race conditions where requests might come in before the session is stored
           console.error(`Session initialized with ID: ${sessionId}`);
           transports[sessionId] = transport;
-        }
+        },
       });
 
       // Set up onclose handler to clean up transport when closed
       transport.onclose = () => {
         const sid = transport.sessionId;
         if (sid && transports[sid]) {
-          console.error(`Transport closed for session ${sid}, removing from transports map`);
+          console.error(
+            `Transport closed for session ${sid}, removing from transports map`,
+          );
           delete transports[sid];
         }
       };
@@ -54,10 +56,10 @@ app.post('/mcp', async (req: Request, res: Response) => {
     } else {
       // Invalid request - no session ID or not initialization request
       res.status(400).json({
-        jsonrpc: '2.0',
+        jsonrpc: "2.0",
         error: {
           code: -32000,
-          message: 'Bad Request: No valid session ID provided',
+          message: "Bad Request: No valid session ID provided",
         },
         id: req?.body?.id,
       });
@@ -68,13 +70,13 @@ app.post('/mcp', async (req: Request, res: Response) => {
     // The existing transport is already connected to the server
     await transport.handleRequest(req, res);
   } catch (error) {
-    console.error('Error handling MCP request:', error);
+    console.error("Error handling MCP request:", error);
     if (!res.headersSent) {
       res.status(500).json({
-        jsonrpc: '2.0',
+        jsonrpc: "2.0",
         error: {
           code: -32603,
-          message: 'Internal server error',
+          message: "Internal server error",
         },
         id: req?.body?.id,
       });
@@ -84,15 +86,15 @@ app.post('/mcp', async (req: Request, res: Response) => {
 });
 
 // Handle GET requests for SSE streams (using built-in support from StreamableHTTP)
-app.get('/mcp', async (req: Request, res: Response) => {
-  console.error('Received MCP GET request');
-  const sessionId = req.headers['mcp-session-id'] as string | undefined;
+app.get("/mcp", async (req: Request, res: Response) => {
+  console.error("Received MCP GET request");
+  const sessionId = req.headers["mcp-session-id"] as string | undefined;
   if (!sessionId || !transports[sessionId]) {
     res.status(400).json({
-      jsonrpc: '2.0',
+      jsonrpc: "2.0",
       error: {
         code: -32000,
-        message: 'Bad Request: No valid session ID provided',
+        message: "Bad Request: No valid session ID provided",
       },
       id: req?.body?.id,
     });
@@ -100,7 +102,7 @@ app.get('/mcp', async (req: Request, res: Response) => {
   }
 
   // Check for Last-Event-ID header for resumability
-  const lastEventId = req.headers['last-event-id'] as string | undefined;
+  const lastEventId = req.headers["last-event-id"] as string | undefined;
   if (lastEventId) {
     console.error(`Client reconnecting with Last-Event-ID: ${lastEventId}`);
   } else {
@@ -112,33 +114,35 @@ app.get('/mcp', async (req: Request, res: Response) => {
 });
 
 // Handle DELETE requests for session termination (according to MCP spec)
-app.delete('/mcp', async (req: Request, res: Response) => {
-  const sessionId = req.headers['mcp-session-id'] as string | undefined;
+app.delete("/mcp", async (req: Request, res: Response) => {
+  const sessionId = req.headers["mcp-session-id"] as string | undefined;
   if (!sessionId || !transports[sessionId]) {
     res.status(400).json({
-      jsonrpc: '2.0',
+      jsonrpc: "2.0",
       error: {
         code: -32000,
-        message: 'Bad Request: No valid session ID provided',
+        message: "Bad Request: No valid session ID provided",
       },
       id: req?.body?.id,
     });
     return;
   }
 
-  console.error(`Received session termination request for session ${sessionId}`);
+  console.error(
+    `Received session termination request for session ${sessionId}`,
+  );
 
   try {
     const transport = transports[sessionId];
     await transport.handleRequest(req, res);
   } catch (error) {
-    console.error('Error handling session termination:', error);
+    console.error("Error handling session termination:", error);
     if (!res.headersSent) {
       res.status(500).json({
-        jsonrpc: '2.0',
+        jsonrpc: "2.0",
         error: {
           code: -32603,
-          message: 'Error handling session termination',
+          message: "Error handling session termination",
         },
         id: req?.body?.id,
       });
@@ -154,8 +158,8 @@ app.listen(PORT, () => {
 });
 
 // Handle server shutdown
-process.on('SIGINT', async () => {
-  console.error('Shutting down server...');
+process.on("SIGINT", async () => {
+  console.error("Shutting down server...");
 
   // Close all active transports to properly clean up resources
   for (const sessionId in transports) {
@@ -169,6 +173,6 @@ process.on('SIGINT', async () => {
   }
 
   await server.close();
-  console.error('Server shutdown complete');
+  console.error("Server shutdown complete");
   process.exit(0);
 });
