@@ -2,9 +2,6 @@ import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createServer } from "./goose-team.ts";
 import express from "express";
 
-// Create the SSE server
-const { server } = createServer();
-
 // Create the express app
 const app = express();
 
@@ -15,6 +12,8 @@ const transports: Map<string, SSEServerTransport> = new Map<
 
 app.get("/sse", async (req, res) => {
   let transport;
+  const { server } = createServer();
+
   if (req?.query?.sessionId) {
     const sessionId = (req?.query?.sessionId as string) || "none";
     transport = transports.get(sessionId) as SSEServerTransport;
@@ -32,6 +31,7 @@ app.get("/sse", async (req, res) => {
   // Handle close of connection
   server.onclose = async () => {
     console.log("Client Disconnected: ", transport.sessionId);
+    transport.close();
     transports.delete(transport.sessionId);
   };
 });

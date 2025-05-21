@@ -30536,13 +30536,13 @@ var require_application = __commonJS({
       tryRender(view, renderOptions, done);
     };
     app2.listen = function listen() {
-      var server2 = http.createServer(this);
+      var server = http.createServer(this);
       var args = Array.prototype.slice.call(arguments);
       if (typeof args[args.length - 1] === "function") {
         var done = args[args.length - 1] = once(args[args.length - 1]);
-        server2.once("error", done);
+        server.once("error", done);
       }
-      return server2.listen.apply(server2, args);
+      return server.listen.apply(server, args);
     };
     function logerror(err) {
       if (this.get("env") !== "test") console.error(err.stack || err.toString());
@@ -59063,7 +59063,7 @@ var completeTask = (taskId) => {
 
 // src/goose-team.ts
 var createServer = () => {
-  const server2 = new Server(
+  const server = new Server(
     {
       name: "goose-team",
       version: VERSION
@@ -59074,7 +59074,7 @@ var createServer = () => {
       }
     }
   );
-  server2.setRequestHandler(ListToolsRequestSchema, async () => {
+  server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
       tools: [
         {
@@ -59140,7 +59140,7 @@ var createServer = () => {
       ]
     };
   });
-  server2.setRequestHandler(CallToolRequestSchema, async (request) => {
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
     try {
       switch (request.params.name) {
         case "register_agent": {
@@ -59176,7 +59176,10 @@ var createServer = () => {
           const messageId = addMessage(args.senderId, args.content);
           return {
             content: [
-              { type: "text", text: `Message ${messageId} added successfully.` }
+              {
+                type: "text",
+                text: `Message ${messageId} added successfully.`
+              }
             ]
           };
         }
@@ -59222,7 +59225,9 @@ var createServer = () => {
         case "list_tasks": {
           const allTasks = listTasks();
           return {
-            content: [{ type: "text", text: JSON.stringify(allTasks, null, 2) }]
+            content: [
+              { type: "text", text: JSON.stringify(allTasks, null, 2) }
+            ]
           };
         }
         case "complete_task": {
@@ -59244,17 +59249,17 @@ var createServer = () => {
       );
     }
   });
-  return { server: server2 };
+  return { server };
 };
 
 // src/sse.ts
 var import_express = __toESM(require_express2(), 1);
-var { server } = createServer();
 var app = (0, import_express.default)();
 var transports = /* @__PURE__ */ new Map();
 app.get("/sse", async (req, res) => {
   var _a, _b;
   let transport;
+  const { server } = createServer();
   if ((_a = req == null ? void 0 : req.query) == null ? void 0 : _a.sessionId) {
     const sessionId = ((_b = req == null ? void 0 : req.query) == null ? void 0 : _b.sessionId) || "none";
     transport = transports.get(sessionId);
@@ -59267,6 +59272,7 @@ app.get("/sse", async (req, res) => {
   }
   server.onclose = async () => {
     console.log("Client Disconnected: ", transport.sessionId);
+    transport.close();
     transports.delete(transport.sessionId);
   };
 });
