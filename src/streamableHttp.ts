@@ -8,8 +8,6 @@ console.error("Starting Streamable HTTP server...");
 
 const app = express();
 
-const { server } = createServer();
-
 const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
 
 app.post("/mcp", async (req: Request, res: Response) => {
@@ -23,6 +21,9 @@ app.post("/mcp", async (req: Request, res: Response) => {
       // Reuse existing transport
       transport = transports[sessionId];
     } else if (!sessionId) {
+
+      const { server } = createServer();
+
       // New initialization request
       const eventStore = new InMemoryEventStore();
       transport = new StreamableHTTPServerTransport({
@@ -44,6 +45,7 @@ app.post("/mcp", async (req: Request, res: Response) => {
             `Transport closed for session ${sid}, removing from transports map`,
           );
           delete transports[sid];
+          server.close();
         }
       };
 
@@ -172,7 +174,6 @@ process.on("SIGINT", async () => {
     }
   }
 
-  await server.close();
   console.error("Server shutdown complete");
   process.exit(0);
 });
