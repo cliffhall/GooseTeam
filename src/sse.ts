@@ -11,7 +11,7 @@ const transports: Map<string, SSEServerTransport> = new Map<
 >();
 
 app.get("/sse", async (req, res) => {
-  let transport;
+  let transport: SSEServerTransport;
   const { server } = createServer();
 
   if (req?.query?.sessionId) {
@@ -26,14 +26,15 @@ app.get("/sse", async (req, res) => {
     // Connect server to transport
     await server.connect(transport);
     console.log("Client Connected: ", transport.sessionId);
+
+    // Handle close of connection
+    server.onclose = async () => {
+      console.log("Client Disconnected: ", transport.sessionId);
+      await transport.close();
+      transports.delete(transport.sessionId);
+    };
   }
 
-  // Handle close of connection
-  server.onclose = async () => {
-    console.log("Client Disconnected: ", transport.sessionId);
-    transport.close();
-    transports.delete(transport.sessionId);
-  };
 });
 
 app.post("/message", async (req, res) => {

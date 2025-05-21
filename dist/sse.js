@@ -59269,12 +59269,12 @@ app.get("/sse", async (req, res) => {
     transports.set(transport.sessionId, transport);
     await server.connect(transport);
     console.log("Client Connected: ", transport.sessionId);
+    server.onclose = async () => {
+      console.log("Client Disconnected: ", transport.sessionId);
+      await transport.close();
+      transports.delete(transport.sessionId);
+    };
   }
-  server.onclose = async () => {
-    console.log("Client Disconnected: ", transport.sessionId);
-    transport.close();
-    transports.delete(transport.sessionId);
-  };
 });
 app.post("/message", async (req, res) => {
   var _a;
