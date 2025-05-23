@@ -59271,7 +59271,6 @@ app.get("/sse", async (req, res) => {
     console.log("Client Connected: ", transport.sessionId);
     server.onclose = async () => {
       console.log("Client Disconnected: ", transport.sessionId);
-      await transport.close();
       transports.delete(transport.sessionId);
     };
   }
