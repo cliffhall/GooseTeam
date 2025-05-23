@@ -30,7 +30,6 @@ app.get("/sse", async (req, res) => {
     // Handle close of connection
     server.onclose = async () => {
       console.log("Client Disconnected: ", transport.sessionId);
-      await transport.close();
       transports.delete(transport.sessionId);
     };
   }
