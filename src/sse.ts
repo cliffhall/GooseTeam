@@ -20,7 +20,7 @@ app.get("/sse", async (req, res) => {
     console.log("Client Reconnecting? ", transport.sessionId);
   } else {
     // Create and store transport for new session
-    transport = new SSEServerTransport("/message", res);
+    transport = new SSEServerTransport("my/custom/endpoint", res);
     transports.set(transport.sessionId, transport);
 
     // Connect server to transport
@@ -36,7 +36,7 @@ app.get("/sse", async (req, res) => {
 
 });
 
-app.post("/message", async (req, res) => {
+app.post("/my/custom/endpoint", async (req, res) => {
   const sessionId = (req?.query?.sessionId as string) || "none";
   const transport = transports.get(sessionId);
   if (transport) {

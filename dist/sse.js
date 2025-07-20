@@ -59265,7 +59265,7 @@ app.get("/sse", async (req, res) => {
     transport = transports.get(sessionId);
     console.log("Client Reconnecting? ", transport.sessionId);
   } else {
-    transport = new SSEServerTransport("/message", res);
+    transport = new SSEServerTransport("my/custom/endpoint", res);
     transports.set(transport.sessionId, transport);
     await server.connect(transport);
     console.log("Client Connected: ", transport.sessionId);
@@ -59275,7 +59275,7 @@ app.get("/sse", async (req, res) => {
     };
   }
 });
-app.post("/message", async (req, res) => {
+app.post("/my/custom/endpoint", async (req, res) => {
   var _a;
   const sessionId = ((_a = req == null ? void 0 : req.query) == null ? void 0 : _a.sessionId) || "none";
   const transport = transports.get(sessionId);

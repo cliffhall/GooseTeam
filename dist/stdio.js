@@ -7230,3 +7230,15 @@ runServer().catch((error) => {
   console.error("Fatal error in main():", error);
   process.exit(1);
 });
+process.on("SIGINT", () => {
+  console.error("SIGINT");
+  process.exit();
+});
+process.on("SIGTERM", () => {
+  console.error("SIGTERM");
+  process.exit();
+});
+process.on("SIGHUP", () => {
+  console.error("SIGHUP");
+  process.exit();
+});
